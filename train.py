@@ -1,12 +1,15 @@
+import os
 import sys
 import argparse
+import numpy as np
 import tensorflow as tf
 from os.path import exists
 from os import makedirs, walk
 from keras.models import load_model # type: ignore
+from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint # type: ignore
 
-from utils import preprocess_img
+from utils import preprocess_img, preprocess_augmentation_img
 from CNN import create_model_elements
 from modelCallbacks import BatchCheckpointCallback, CustomImageDataGenerator
 
@@ -52,21 +55,46 @@ def main(args):
     early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3)
     checkpoint = ModelCheckpoint(f'{checkpointPath}/best_model.keras', monitor='val_loss', save_best_only=True, verbose=1)
+    
+    images, labels = load_data(datasetPath)
+    X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2, random_state=42)
 
-    X_train = CustomImageDataGenerator(
-        directory=datasetPath,
+    train_generator = CustomImageDataGenerator(
+        image_paths=X_train,
+        labels=y_train,
+        batch_size=batch_size,
+        image_size=image_size,
+        preprocess_function=preprocess_augmentation_img,
+        class_mode='binary'
+    )
+
+    val_generator = CustomImageDataGenerator(
+        image_paths=X_val,
+        labels=y_val,
         batch_size=batch_size,
         image_size=image_size,
         preprocess_function=preprocess_img,
-        class_mode='binary',
-        classes={'Reales': 0, 'Ataque': 1}
+        class_mode='binary'
     )
             
     model.fit(
-        X_train, 
+        train_generator,
+        validation_data=val_generator,
         epochs=numEpochs,
         callbacks=[batchCheckpointCallback, early_stopping, reduce_lr, checkpoint]
-        )
+    )
+    
+def load_data(datasetPath):
+    images = []
+    labels = []
+    for folder in os.listdir(datasetPath):
+        folder_path = os.path.join(datasetPath, folder)
+        for img_file in os.listdir(folder_path):
+            img_path = os.path.join(folder_path, img_file)
+            images.append(img_path)
+            labels.append(0 if folder == 'Reales' else 1)
+    return np.array(images), np.array(labels)
+
 
 def count_img(directory):
     image_extensions = ('.jpg', '.jpeg', '.png')
