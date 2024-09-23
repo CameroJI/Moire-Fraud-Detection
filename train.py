@@ -31,19 +31,9 @@ def main(args):
     WIDTH = args.width
     image_size = (HEIGHT, WIDTH)
         
-    initial_learning_rate = args.learning_rate
-    final_learning_rate = 1e-5
-    decay_steps = count_img(datasetPath) // batch_size
-    decay_rate = (final_learning_rate / initial_learning_rate) ** (1 / decay_steps)
+    learning_rate = args.learning_rate
 
-    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-        initial_learning_rate=initial_learning_rate,
-        decay_steps=decay_steps,
-        decay_rate=decay_rate,
-        staircase=True
-    )
-
-    optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
     
     if not exists(checkpointPath):
         makedirs(checkpointPath)
@@ -66,7 +56,7 @@ def main(args):
     X_train = CustomImageDataGenerator(
         directory=datasetPath,
         batch_size=batch_size,
-        image_size=(HEIGHT, WIDTH),
+        image_size=image_size,
         preprocess_function=preprocess_img,
         class_mode='binary',
         classes={'Reales': 0, 'Ataque': 1}
