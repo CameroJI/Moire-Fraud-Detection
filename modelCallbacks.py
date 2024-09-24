@@ -64,22 +64,32 @@ class CustomImageDataGenerator(tf.keras.utils.Sequence):
         for root, _, files in os.walk(self.directory):
             for file in files:
                 if file.lower().endswith(image_extensions):
-                    image_paths.append(os.path.join(root, file))
+                    full_path = os.path.join(root, file)
+                    try:
+                        image = tf.io.read_file(full_path)
+                        tf.image.decode_image(image, channels=3)
+                        image_paths.append(full_path)
+                    except Exception as e:
+                        print(f"Ignoring invalid image file: {full_path}, error: {e}")
                 else:
                     print(f"Ignoring non-image file: {os.path.join(root, file)}")
         return image_paths
 
     def _load_and_preprocess_image(self, image_path):
-        image = tf.io.read_file(image_path)
-        image = tf.image.decode_image(image, channels=3)
-        image = tf.image.resize(image, self.image_size)
-        components = self.preprocess_function(image)
-        
-        required_keys = {'LL_Input', 'LH_Input', 'HL_Input', 'HH_Input', 'Scharr_Input', 'Sobel_Input', 'Gabor_Input'}
-        if not all(key in components for key in required_keys):
-            raise ValueError("Preprocessing function must return a dictionary with keys 'LL_Input', 'LH_Input', 'HL_Input', 'HH_Input', 'Scharr_Input', 'Sobel_Input' and 'Gabor_Input'.")
-        
-        return components
+        try:
+            image = tf.io.read_file(image_path)
+            image = tf.image.decode_image(image, channels=3)
+            image = tf.image.resize(image, self.image_size)
+            components = self.preprocess_function(image)
+            
+            required_keys = {'LL_Input', 'LH_Input', 'HL_Input', 'HH_Input', 'Scharr_Input', 'Sobel_Input', 'Gabor_Input'}
+            if not all(key in components for key in required_keys):
+                raise ValueError("Preprocessing function must return a dictionary with keys 'LL_Input', 'LH_Input', 'HL_Input', 'HH_Input', 'Scharr_Input', 'Sobel_Input' and 'Gabor_Input'.")
+            
+            return components
+        except Exception as e:
+            print(f"Error loading image {image_path}: {e}")
+            return None
 
     def on_epoch_end(self):
         if self.shuffle:
