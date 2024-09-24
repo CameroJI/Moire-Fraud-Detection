@@ -57,6 +57,17 @@ class CustomImageDataGenerator(tf.keras.utils.Sequence):
         batch_images_dict = {key: np.stack(value) for key, value in batch_images_dict.items()}
         
         return batch_images_dict, batch_labels
+    
+    def _get_image_paths(self):
+        image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp')
+        image_paths = []
+        for root, _, files in os.walk(self.directory):
+            for file in files:
+                if file.lower().endswith(image_extensions):
+                    image_paths.append(os.path.join(root, file))
+                else:
+                    print(f"Ignoring non-image file: {os.path.join(root, file)}")
+        return image_paths
 
     def _load_and_preprocess_image(self, image_path):
         image = tf.io.read_file(image_path)
