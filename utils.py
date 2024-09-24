@@ -59,7 +59,7 @@ def resize(component, target_height, target_width):
     component_resized = tf.image.resize(component, (int(target_height), int(target_width)), method='bilinear')
     return component_resized
 
-def preprocess_augmentation_img(image, height, width):
+def preprocess_augmentation_img(image, height=800, width=1400):
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_brightness(image, max_delta=0.3)
@@ -101,7 +101,7 @@ def preprocess_augmentation_img(image, height, width):
         'Gabor_Input': imgGabor_resized
     }
     
-def preprocess_img(image, height, width):
+def preprocess_img(image, height=800, width=1400):
     imageCrop = crop(image, height, width)
     image = tf.image.rgb_to_grayscale(imageCrop)
     imgScharr = scharr(image)
