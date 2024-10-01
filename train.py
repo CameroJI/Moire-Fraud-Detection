@@ -57,7 +57,7 @@ def main(args):
     checkpoint = ModelCheckpoint(f'{checkpointPath}/best_model.keras', monitor='val_loss', save_best_only=True, verbose=1)
     
     images, labels = load_data(datasetPath)
-    X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2, random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2)
 
     train_generator = CustomImageDataGenerator(
         image_paths=X_train,
@@ -87,9 +87,11 @@ def main(args):
 def load_data(datasetPath):
     images = []
     labels = []
-    for folder in os.listdir(datasetPath):
+    folders = [folder for folder in os.listdir(datasetPath) if os.path.isdir(os.path.join(datasetPath, folder))]
+    for folder in folders:
         folder_path = os.path.join(datasetPath, folder)
-        for img_file in os.listdir(folder_path):
+        img_list = [img for img in os.listdir(folder_path) if img.lower().endswith(('.jpg', '.png', 'jpeg'))]
+        for img_file in img_list:
             img_path = os.path.join(folder_path, img_file)
             images.append(img_path)
             labels.append(0 if folder == 'Reales' else 1)
