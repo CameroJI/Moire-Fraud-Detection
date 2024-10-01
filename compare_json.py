@@ -12,8 +12,6 @@ def main(args):
 
     if txtPath:
         create_txt(dirPath, pass_list, fail_list, warning_list)
-        
-    
     
 def get_folder_scores(path, separe_warning):
     folder_list =[folder for folder in os.listdir(path) if os.path.isdir(os.path.join(path, folder))]
