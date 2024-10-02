@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import warnings
 import numpy as np
 import tensorflow as tf
 from os.path import exists
@@ -11,6 +12,8 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCh
 from utils import preprocess_img, preprocess_augmentation_img, get_model
 from modelCallbacks import BatchCheckpointCallback, CustomImageDataGenerator
 
+warnings.filterwarnings('ignore', category=UserWarning)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 HEIGHT = 800
 WIDTH = 1400
