@@ -20,12 +20,12 @@ def main(args):
     img = load_img(imgPath, height=height, width=width)
     
     img = preprocess_img(img)
-    prediction = test_image(model, img)
+    prediction = predict_img(model, img)
     
     prediction_label = 'Real' if prediction == 0 else 'Ataque'
     print(prediction_label)
 
-def test_image(model, img):
+def predict_img(model, img):
     prediction = model.predict({
         'LL_Input': np.expand_dims(img['LL_Input'], axis=0),
         'LH_Input': np.expand_dims(img['LH_Input'], axis=0),
