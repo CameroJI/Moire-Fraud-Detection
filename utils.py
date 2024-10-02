@@ -1,7 +1,11 @@
 import cv2
-import numpy as np
 import pywt
+import numpy as np
 import tensorflow as tf
+from keras.models import load_model # type: ignore
+from tensorflow.keras.preprocessing import image # type: ignore
+
+from CNN import create_model_elements
 
 def scharr(img):
     image_np = img.numpy()
@@ -137,3 +141,15 @@ def preprocess_img(image, height=800, width=1400):
         'Sobel_Input': imgSobel_resized,
         'Gabor_Input': imgGabor_resized
     }
+    
+def get_model(loadFlag, path, height=800, width=1400):
+    if loadFlag:
+        model = load_model(path)
+    else:
+        model = create_model_elements(height=int(height/8), width=int(width/8), depth=1)
+        
+    return model
+
+def load_img(path, height=800, width=1400):
+    img = image.load_img(path, target_size=(height, width))
+    return img

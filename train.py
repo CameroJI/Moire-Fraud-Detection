@@ -5,12 +5,10 @@ import numpy as np
 import tensorflow as tf
 from os.path import exists
 from os import makedirs, walk
-from keras.models import load_model # type: ignore
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint # type: ignore
 
-from utils import preprocess_img, preprocess_augmentation_img
-from CNN import create_model_elements
+from utils import preprocess_img, preprocess_augmentation_img, get_model
 from modelCallbacks import BatchCheckpointCallback, CustomImageDataGenerator
 
 
@@ -43,7 +41,7 @@ def main(args):
             
     checkpointPathModel = f"{checkpointPath}/model.keras"
     
-    model = get_model(loadCheckPoint, checkpointPathModel)
+    model = get_model(loadCheckPoint, checkpointPathModel, HEIGHT, WIDTH)
 
     model.compile(
         loss='binary_crossentropy',
@@ -108,14 +106,6 @@ def count_img(directory):
                 total_images += 1
     
     return total_images
-
-def get_model(loadFlag, path):
-    if loadFlag:
-        model = load_model(path)
-    else:
-        model = create_model_elements(height=int(HEIGHT/8), width=int(WIDTH/8), depth=1)
-        
-    return model
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()

@@ -1,11 +1,13 @@
 import os
 import sys
+import warnings
 import argparse
 import numpy as np
-from tensorflow.keras.preprocessing import image # type: ignore
 
-from train import get_model
-from utils import preprocess_img
+from utils import preprocess_img, get_model, load_img
+
+warnings.filterwarnings('ignore', category=UserWarning)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 def main(args):    
     modelPath = args.modelPath
@@ -22,10 +24,6 @@ def main(args):
     
     prediction_label = 'Real' if prediction == 0 else 'Ataque'
     print(prediction_label)
-
-def load_img(path, height, width):
-    img = image.load_img(path, target_size=(height, width))
-    return img
 
 def test_image(model, img):
     prediction = model.predict({
