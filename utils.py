@@ -70,6 +70,11 @@ def preprocess_augmentation_img(image, height=800, width=1400):
     image = tf.image.random_contrast(image, lower=0.65, upper=1.35)
     
     imageCrop = crop(image, height, width)
+    
+    r_channel = imageCrop[..., 0]
+    g_channel = imageCrop[..., 1]
+    b_channel = imageCrop[..., 2]
+    
     image = tf.image.rgb_to_grayscale(imageCrop)
     imgScharr = scharr(image)
     imgSobel = sobel(image)
@@ -86,6 +91,9 @@ def preprocess_augmentation_img(image, height=800, width=1400):
     imgScharr_tensor = np.expand_dims(imgScharr, axis=-1)
     imgSobel_tensor = np.expand_dims(imgSobel, axis=-1)
     imgGabor_tensor = np.expand_dims(imgGabor, axis=-1)
+    r_tensor = np.expand_dims(r_channel, axis=-1)
+    g_tensor = np.expand_dims(g_channel, axis=-1)
+    b_tensor = np.expand_dims(b_channel, axis=-1)
     
     LL_resized = resize(LL_tensor, height/8, width/8)
     LH_resized = resize(LH_tensor, height/8, width/8)
@@ -94,6 +102,10 @@ def preprocess_augmentation_img(image, height=800, width=1400):
     imgScharr_resized = resize(imgScharr_tensor, height/8, width/8)
     imgSobel_resized= resize(imgSobel_tensor, height/8, width/8)
     imgGabor_resized = resize(imgGabor_tensor, height/8, width/8)
+
+    r_resized = resize(r_tensor, height/8, width/8)
+    g_resized = resize(g_tensor, height/8, width/8)
+    b_resized = resize(b_tensor, height/8, width/8)
         
     return {
         'LL_Input': LL_resized,
@@ -102,11 +114,19 @@ def preprocess_augmentation_img(image, height=800, width=1400):
         'HH_Input': HH_resized,
         'Scharr_Input': imgScharr_resized,
         'Sobel_Input': imgSobel_resized,
-        'Gabor_Input': imgGabor_resized
+        'Gabor_Input': imgGabor_resized,
+        'R_Input': r_resized,
+        'G_Input': g_resized,
+        'B_Input': b_resized
     }
     
 def preprocess_img(image, height=800, width=1400):
     imageCrop = crop(image, height, width)
+    
+    r_channel = imageCrop[..., 0]
+    g_channel = imageCrop[..., 1]
+    b_channel = imageCrop[..., 2]
+    
     image = tf.image.rgb_to_grayscale(imageCrop)
     imgScharr = scharr(image)
     imgSobel = sobel(image)
@@ -123,6 +143,9 @@ def preprocess_img(image, height=800, width=1400):
     imgScharr_tensor = np.expand_dims(imgScharr, axis=-1)
     imgSobel_tensor = np.expand_dims(imgSobel, axis=-1)
     imgGabor_tensor = np.expand_dims(imgGabor, axis=-1)
+    r_tensor = np.expand_dims(r_channel, axis=-1)
+    g_tensor = np.expand_dims(g_channel, axis=-1)
+    b_tensor = np.expand_dims(b_channel, axis=-1)
     
     LL_resized = resize(LL_tensor, height/8, width/8)
     LH_resized = resize(LH_tensor, height/8, width/8)
@@ -131,6 +154,10 @@ def preprocess_img(image, height=800, width=1400):
     imgScharr_resized = resize(imgScharr_tensor, height/8, width/8)
     imgSobel_resized= resize(imgSobel_tensor, height/8, width/8)
     imgGabor_resized = resize(imgGabor_tensor, height/8, width/8)
+
+    r_resized = resize(r_tensor, height/8, width/8)
+    g_resized = resize(g_tensor, height/8, width/8)
+    b_resized = resize(b_tensor, height/8, width/8)
         
     return {
         'LL_Input': LL_resized,
@@ -139,7 +166,10 @@ def preprocess_img(image, height=800, width=1400):
         'HH_Input': HH_resized,
         'Scharr_Input': imgScharr_resized,
         'Sobel_Input': imgSobel_resized,
-        'Gabor_Input': imgGabor_resized
+        'Gabor_Input': imgGabor_resized,
+        'R_Input': r_resized,
+        'G_Input': g_resized,
+        'B_Input': b_resized
     }
     
 def get_model(loadFlag, path, height=800, width=1400):
