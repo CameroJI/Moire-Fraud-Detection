@@ -29,7 +29,7 @@ def main(args):
     batch_size = args.batch_size
     
     checkpointPath = args.checkpointPath
-    loadCheckPoint = args.loadCheckPoint
+    loadCheckpoint = args.loadCheckpoint
     
     HEIGHT = args.height
     WIDTH = args.width
@@ -44,7 +44,7 @@ def main(args):
             
     checkpointPathModel = f"{checkpointPath}/model.keras"
     
-    model = get_model(loadCheckPoint, checkpointPathModel, HEIGHT, WIDTH)
+    model = get_model(loadCheckpoint, checkpointPathModel, HEIGHT, WIDTH)
 
     model.compile(
         loss='binary_crossentropy',
