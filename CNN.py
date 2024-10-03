@@ -86,10 +86,18 @@ def create_model_elements(height, width, depth):
     x_G = conv_block(input_G)
     x_B = conv_block(input_B)
 
-    concatenated = Concatenate()([x_LL, x_HL, x_LH, x_HH, x_Scharr, x_Sobel, x_Gabor, x_R, x_G, x_B])
+    wavelet_features = Concatenate()([x_LL, x_HL, x_LH, x_HH])
+    edge_features = Concatenate()([x_Scharr, x_Sobel, x_Gabor])
+    rgb_features = Concatenate()([x_R, x_G, x_B])
 
-    x = Dense(128, activation='relu')(concatenated)
-    x = Dense(64, activation='relu')(x)
+    wavelet_conv = Dense(128, activation='relu')(wavelet_features)
+    edge_conv = Dense(128, activation='relu')(edge_features)
+    rgb_conv = Dense(128, activation='relu')(rgb_features)
+
+    combined_all = Concatenate()([wavelet_conv, edge_conv, rgb_conv])
+    
+    x = Dense(256, activation='relu')(combined_all)
+    x = Dense(128, activation='relu')(x)
     predictions = Dense(1, activation='sigmoid')(x)
 
     return Model(inputs=[input_LL, input_HL, input_LH, input_HH, input_Scharr, input_Sobel, input_Gabor, input_R, input_G, input_B], outputs=predictions)

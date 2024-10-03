@@ -3,3 +3,9 @@
 checkpoint/best_model.keras
 .DS_Store
 playground.ipynb
+.DS_Store
+__pycache__/CNN.cpython-39.pyc
+__pycache__/CNN.cpython-39.pyc
+__pycache__/predict.cpython-39.pyc
+__pycache__/utils.cpython-39.pyc
+__pycache__/CNN.cpython-39.pyc
