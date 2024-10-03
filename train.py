@@ -118,7 +118,7 @@ def parse_arguments(argv):
     parser.add_argument('--checkpointPath', type=str, help='Directory for model Checkpoint', default='./checkpoint/')
     
     parser.add_argument('--epochs', type=int, help='Number of epochs for training', default=10)
-    parser.add_argument('--save_iter', type=int, help='Number of iterations to save the model', default=10)
+    parser.add_argument('--save_iter', type=int, help='Number of iterations to save the model', default=1000)
 
     parser.add_argument('--batch_size', type=int, help='Batch size for epoch in training', default=32)
     parser.add_argument('--height', type=int, help='Image height resize', default=800)
