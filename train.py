@@ -32,7 +32,7 @@ def main(args):
     
     checkpointPath = args.checkpointPath
     loadCheckpoint = args.loadCheckpoint
-    ResNet50 = args.ResNet50
+    ResNet = args.ResNet
     
     HEIGHT = args.height
     WIDTH = args.width
@@ -47,7 +47,7 @@ def main(args):
             
     checkpointPathModel = f"{checkpointPath}/model.keras"
     
-    model = get_model(loadCheckpoint, checkpointPathModel, ResNet50, HEIGHT, WIDTH)
+    model = get_model(loadCheckpoint, checkpointPathModel, ResNet, HEIGHT, WIDTH)
 
     model.compile(
         loss='binary_crossentropy',
@@ -63,7 +63,7 @@ def main(args):
     images, labels = load_data(datasetPath)
     X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2)
 
-    train_generator, val_generator = get_generator(ResNet50, X_train, y_train, X_val, y_val, batch_size, image_size)
+    train_generator, val_generator = get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size)
             
     model.fit(
         train_generator,
@@ -85,8 +85,8 @@ def load_data(datasetPath):
             labels.append(0 if folder == 'Reales' else 1)
     return np.array(images), np.array(labels)
 
-def get_generator(ResNet50, X_train, y_train, X_val, y_val, batch_size, image_size):
-    if not ResNet50:
+def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size):
+    if not ResNet:
         train_generator = CustomImageDataGenerator(
             image_paths=X_train,
             labels=y_train,
@@ -172,7 +172,7 @@ def parse_arguments(argv):
     
     parser.add_argument('--learning_rate', type=float, help='Model learning rate for iteration', default=1e-3)
     
-    parser.add_argument('--ResNet50', action='store_true', default=False, help='Use ResNet model')
+    parser.add_argument('--ResNet', action='store_true', default=False, help='Use ResNet model')
     parser.add_argument('--loadCheckpoint', action='store_true', default=False, help='load Checkpoint Model')
 
     return parser.parse_args(argv)
