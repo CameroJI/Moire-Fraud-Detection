@@ -3,10 +3,12 @@ import sys
 import argparse
 import warnings
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 from os.path import exists
 from os import makedirs, walk
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint # type: ignore
 
 from utils import preprocess_img, preprocess_augmentation_img, get_model
@@ -30,6 +32,7 @@ def main(args):
     
     checkpointPath = args.checkpointPath
     loadCheckpoint = args.loadCheckpoint
+    ResNet50 = args.ResNet50
     
     HEIGHT = args.height
     WIDTH = args.width
@@ -44,7 +47,7 @@ def main(args):
             
     checkpointPathModel = f"{checkpointPath}/model.keras"
     
-    model = get_model(loadCheckpoint, checkpointPathModel, HEIGHT, WIDTH)
+    model = get_model(loadCheckpoint, checkpointPathModel, ResNet50, HEIGHT, WIDTH)
 
     model.compile(
         loss='binary_crossentropy',
@@ -60,23 +63,7 @@ def main(args):
     images, labels = load_data(datasetPath)
     X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2)
 
-    train_generator = CustomImageDataGenerator(
-        image_paths=X_train,
-        labels=y_train,
-        batch_size=batch_size,
-        image_size=image_size,
-        preprocess_function=preprocess_augmentation_img,
-        class_mode='binary'
-    )
-
-    val_generator = CustomImageDataGenerator(
-        image_paths=X_val,
-        labels=y_val,
-        batch_size=batch_size,
-        image_size=image_size,
-        preprocess_function=preprocess_img,
-        class_mode='binary'
-    )
+    train_generator, val_generator = get_generator(ResNet50, X_train, y_train, X_val, y_val, batch_size, image_size)
             
     model.fit(
         train_generator,
@@ -98,6 +85,65 @@ def load_data(datasetPath):
             labels.append(0 if folder == 'Reales' else 1)
     return np.array(images), np.array(labels)
 
+def get_generator(ResNet50, X_train, y_train, X_val, y_val, batch_size, image_size):
+    if not ResNet50:
+        train_generator = CustomImageDataGenerator(
+            image_paths=X_train,
+            labels=y_train,
+            batch_size=batch_size,
+            image_size=image_size,
+            preprocess_function=preprocess_augmentation_img,
+            class_mode='binary'
+        )
+
+        val_generator = CustomImageDataGenerator(
+            image_paths=X_val,
+            labels=y_val,
+            batch_size=batch_size,
+            image_size=image_size,
+            preprocess_function=preprocess_img,
+            class_mode='binary'
+        )
+    else:
+        train_df = pd.DataFrame({'filename': X_train, 'label': y_train})
+        val_df = pd.DataFrame({'filename': X_val, 'label': y_val})
+        
+        train_df['label'] = train_df['label'].astype(str)
+        val_df['label'] = val_df['label'].astype(str)
+        
+        train_datagen = ImageDataGenerator(
+            rotation_range=30,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            shear_range=0.2,
+            zoom_range=0.2,
+            horizontal_flip=True,
+            fill_mode='nearest'
+        )
+
+        val_datagen = ImageDataGenerator()
+
+        train_generator = train_datagen.flow_from_dataframe(
+            dataframe=train_df,
+            x_col='filename',
+            y_col='label',
+            target_size=(HEIGHT, WIDTH),
+            batch_size=batch_size,
+            class_mode='binary',
+            shuffle=True
+        )
+
+        val_generator = val_datagen.flow_from_dataframe(
+            dataframe=val_df,
+            x_col='filename',
+            y_col='label',
+            target_size=(HEIGHT, WIDTH),
+            batch_size=batch_size,
+            class_mode='binary',
+            shuffle=False
+        )
+    
+    return train_generator, val_generator
 
 def count_img(directory):
     image_extensions = ('.jpg', '.jpeg', '.png')
@@ -126,6 +172,7 @@ def parse_arguments(argv):
     
     parser.add_argument('--learning_rate', type=float, help='Model learning rate for iteration', default=1e-3)
     
+    parser.add_argument('--ResNet50', action='store_true', default=False, help='Use ResNet model')
     parser.add_argument('--loadCheckpoint', action='store_true', default=False, help='load Checkpoint Model')
 
     return parser.parse_args(argv)

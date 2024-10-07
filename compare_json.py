@@ -23,8 +23,8 @@ def get_folder_scores(path, separe_warning):
         json_files = [json for json in os.listdir(folder_path) if json.lower().endswith('.json')]
         if len(json_files) != 0:
             for json in json_files:
-                json_score = get_scores(os.path.join(folder_path, json))
                 try:
+                    json_score = get_scores(os.path.join(folder_path, json))
                     score = json_score['result_result'].values[0]
                     if score == 'FAIL':
                         fail_list.append(os.path.join(folder_path, json.replace('result.json', 'large.jpg')))
@@ -39,6 +39,7 @@ def get_folder_scores(path, separe_warning):
                     # print(score)
                 except:
                     # print(json_score)
+                    # print(os.path.join(folder_path, json))
                     continue
                 
     return pass_list, fail_list, warning_list
