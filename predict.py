@@ -46,8 +46,7 @@ def predict_img(model, img, ResNet=False):
     else:
         img_array = img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
-        img_array /= 255.0
-
+        
         prediction = model.predict(img_array, verbose=0)
         prediction_bin = (prediction[0] > 0.5).astype(int)[0]
     return prediction_bin, prediction[0][0]
