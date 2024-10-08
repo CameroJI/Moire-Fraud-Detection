@@ -40,15 +40,15 @@ def predict_img(model, img, ResNet=False):
             'G_Input': np.expand_dims(img['G_Input'], axis=0),
             'B_Input': np.expand_dims(img['B_Input'], axis=0)
         }, verbose=0)
-        
-        prediction_bin = (prediction[0] > 0.5).astype(int)[0]
-        
+
     else:
         img_array = img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
-        
+        # img_array = img_array / 255.0
         prediction = model.predict(img_array, verbose=0)
-        prediction_bin = (prediction[0] > 0.5).astype(int)[0]
+        
+    prediction_bin = (prediction[0] > 0.5).astype(int)[0]
+
     return prediction_bin, prediction[0][0]
 
 def parse_arguments(argv):

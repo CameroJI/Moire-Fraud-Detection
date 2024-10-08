@@ -14,3 +14,7 @@ __pycache__/CNN.cpython-39.pyc
 __pycache__/CNN.cpython-39.pyc
 __pycache__/CNN.cpython-39.pyc
 __pycache__/predict.cpython-39.pyc
+*.pyc
+/__pycache__
+/__pycache__
+/__pycache__
