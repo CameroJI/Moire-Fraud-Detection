@@ -26,6 +26,8 @@ def main(args):
     datasetPath = args.datasetPath
     
     monitor = args.monitor
+    
+    
     numEpochs = args.epochs
     save_iter = args.save_iter
     
@@ -164,6 +166,7 @@ def parse_arguments(argv):
     parser.add_argument('--datasetPath', type=str, help='Directory with dataset images folders.')
     
     parser.add_argument('--monitor', type=str, help='Monitor for learning model', default='val_loss')
+    parser.add_argument('--monitor_mode', type=str, help='Monitor mode for learning model', default='min')
     parser.add_argument('--checkpointPath', type=str, help='Directory for model Checkpoint', default='./checkpoint/')
     
     parser.add_argument('--epochs', type=int, help='Number of epochs for training', default=10)
