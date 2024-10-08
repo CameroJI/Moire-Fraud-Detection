@@ -56,7 +56,7 @@ def model_renNet(height, width, depth):
     x = Dense(1024, activation='relu')(x)
     predictions = Dense(1, activation='sigmoid')(x)
 
-    for layer in base_model.layers[-10:]:
-        layer.trainable = True
+    # for layer in base_model.layers[-10:]:
+    #     layer.trainable = True
 
     return Model(inputs=base_model.input, outputs=predictions)
