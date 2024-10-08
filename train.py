@@ -25,6 +25,7 @@ def main(args):
     
     datasetPath = args.datasetPath
     
+    monitor = args.monitor
     numEpochs = args.epochs
     save_iter = args.save_iter
     
@@ -33,6 +34,7 @@ def main(args):
     checkpointPath = args.checkpointPath
     loadCheckpoint = args.loadCheckpoint
     ResNet = args.ResNet
+    
     
     HEIGHT = args.height
     WIDTH = args.width
@@ -56,9 +58,9 @@ def main(args):
     
     batchCheckpointCallback = BatchCheckpointCallback(batchesNumber=save_iter, path=checkpointPathModel)
     
-    early_stopping = EarlyStopping(monitor='val_recall', patience=5, restore_best_weights=True)
-    reduce_lr = ReduceLROnPlateau(monitor='val_recall', factor=0.1, patience=3)
-    checkpoint = ModelCheckpoint(f'{checkpointPath}/best_model.keras', monitor='val_recall', save_best_only=True, verbose=1)
+    early_stopping = EarlyStopping(monitor=monitor, patience=5, restore_best_weights=True)
+    reduce_lr = ReduceLROnPlateau(monitor=monitor, factor=0.1, patience=3)
+    checkpoint = ModelCheckpoint(f'{checkpointPath}/best_model.keras', monitor=monitor, save_best_only=True, verbose=1)
     
     images, labels = load_data(datasetPath)
     X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2)
@@ -161,6 +163,7 @@ def parse_arguments(argv):
     
     parser.add_argument('--datasetPath', type=str, help='Directory with dataset images folders.')
     
+    parser.add_argument('--monitor', type=str, help='Monitor for learning model', default='val_loss')
     parser.add_argument('--checkpointPath', type=str, help='Directory for model Checkpoint', default='./checkpoint/')
     
     parser.add_argument('--epochs', type=int, help='Number of epochs for training', default=10)
