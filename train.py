@@ -26,7 +26,7 @@ def main(args):
     datasetPath = args.datasetPath
     
     monitor = args.monitor
-    
+    monitor_mode = args.monitor_mode
     
     numEpochs = args.epochs
     save_iter = args.save_iter
@@ -60,9 +60,9 @@ def main(args):
     
     batchCheckpointCallback = BatchCheckpointCallback(batchesNumber=save_iter, path=checkpointPathModel)
     
-    early_stopping = EarlyStopping(monitor=monitor, patience=5, restore_best_weights=True)
-    reduce_lr = ReduceLROnPlateau(monitor=monitor, factor=0.1, patience=3)
-    checkpoint = ModelCheckpoint(f'{checkpointPath}/best_model.keras', monitor=monitor, save_best_only=True, verbose=1)
+    early_stopping = EarlyStopping(monitor=monitor, patience=5, restore_best_weights=True, mode=monitor_mode)
+    reduce_lr = ReduceLROnPlateau(monitor=monitor, factor=0.1, patience=3, mode=monitor_mode)
+    checkpoint = ModelCheckpoint(f'{checkpointPath}/best_model.keras', monitor=monitor, save_best_only=True, verbose=1, mode=monitor_mode)
     
     images, labels = load_data(datasetPath)
     X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2)
