@@ -84,11 +84,11 @@ class CustomImageDataGenerator(tf.keras.utils.Sequence):
             image = tf.image.decode_image(image, channels=3)
             image = tf.image.resize(image, self.image_size)
             components = self.preprocess_function(image)
-            
+
             required_keys = {'LL_Input', 'LH_Input', 'HL_Input', 'HH_Input', 'Scharr_Input', 'Sobel_Input', 'Gabor_Input', 'R_Input', 'G_Input', 'B_Input'}
-            if not all(key in components for key in required_keys):
+            if any(key not in components for key in required_keys):
                 raise ValueError("Preprocessing function must return a dictionary with keys 'LL_Input', 'LH_Input', 'HL_Input', 'HH_Input', 'Scharr_Input', 'Sobel_Input', 'Gabor_Input', 'R_Input', 'G_Input' and 'B_Input'.")
-            
+
             return components
         except Exception as e:
             print(f"Error loading image {image_path}: {e}")

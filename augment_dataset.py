@@ -2,7 +2,7 @@ import os
 import argparse
 from PIL import Image
 import numpy as np
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def augment_image(image_path, output_dir, augmentor, augment_count=1):
