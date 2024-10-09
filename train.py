@@ -68,11 +68,10 @@ def main(args):
     images, labels = load_data(datasetPath)
     X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2)
 
-    train_generator_aug, train_generator, val_generator = get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size)
-    combined_generator = combine_generator(train_generator_aug, train_generator)
-    
+    train_generator, val_generator = get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size)
+            
     model.fit(
-        combined_generator,
+        train_generator,
         validation_data=val_generator,
         epochs=numEpochs,
         callbacks=[batchCheckpointCallback, early_stopping, reduce_lr, checkpoint]
@@ -117,7 +116,7 @@ def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size
         train_df['label'] = train_df['label'].astype(str)
         val_df['label'] = val_df['label'].astype(str)
         
-        train_datagen_aug = ImageDataGenerator(
+        train_datagen = ImageDataGenerator(
             rotation_range=30,
             width_shift_range=0.2,
             height_shift_range=0.2,
@@ -126,25 +125,14 @@ def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size
             horizontal_flip=True,
             fill_mode='nearest'
         )
-        
-        train_datagen = ImageDataGenerator()
+
         val_datagen = ImageDataGenerator()
-        
-        train_generator_aug = train_datagen_aug.flow_from_dataframe(
-            dataframe=train_df,
-            x_col='filename',
-            y_col='label',
-            target_size=image_size,
-            batch_size=batch_size,
-            class_mode='binary',
-            shuffle=True
-        )
 
         train_generator = train_datagen.flow_from_dataframe(
             dataframe=train_df,
             x_col='filename',
             y_col='label',
-            target_size=image_size,
+            target_size=(HEIGHT, WIDTH),
             batch_size=batch_size,
             class_mode='binary',
             shuffle=True
@@ -159,20 +147,8 @@ def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size
             class_mode='binary',
             shuffle=False
         )
-        
-    return train_generator_aug, train_generator, val_generator
-
-def combine_generator(augmented_generator, generator, steps_per_epoch=1):
-    step = 0
-    while step < steps_per_epoch:
-        X_aug, y_aug = next(augmented_generator)
-        X_no_aug, y_no_aug = next(generator)
-
-        X_combined = np.concatenate([X_aug, X_no_aug], axis=0)
-        y_combined = np.concatenate([y_aug, y_no_aug], axis=0)
-
-        yield X_combined, y_combined
-        step += 1
+    
+    return train_generator, val_generator
 
 def count_img(directory):
     image_extensions = ('.jpg', '.jpeg', '.png')
