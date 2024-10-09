@@ -48,8 +48,8 @@ def create_model(height, width, depth):
 def model_renNet(height, width, depth):
     base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(height, width, depth))
 
-    # for layer in base_model.layers:
-    #     layer.trainable = False
+    for layer in base_model.layers:
+        layer.trainable = False
 
     x = base_model.output
     x = Flatten()(x)
