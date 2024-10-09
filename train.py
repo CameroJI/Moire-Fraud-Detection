@@ -162,7 +162,7 @@ def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size
         
     return train_generator_aug, train_generator, val_generator
 
-def combined_generator(augmented_generator, generator, steps_per_epoch=1):
+def combine_generator(augmented_generator, generator, steps_per_epoch=1):
     step = 0
     while step < steps_per_epoch:
         X_aug, y_aug = next(augmented_generator)
