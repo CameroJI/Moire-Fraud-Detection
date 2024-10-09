@@ -44,10 +44,18 @@ def crop(image, target_height, target_width):
     original_height = tf.shape(image)[0]
     original_width = tf.shape(image)[1]
 
-    offset_height = (original_height - target_height) // 2
-    offset_width = (original_width - target_width) // 2
+    scale = tf.minimum(target_width / tf.cast(original_width, tf.float32),
+                       target_height / tf.cast(original_height, tf.float32))
 
-    return image[
+    new_height = tf.cast(original_height * scale, tf.int32)
+    new_width = tf.cast(original_width * scale, tf.int32)
+
+    resized_image = tf.image.resize(image, [new_height, new_width])
+
+    offset_height = (new_height - target_height) // 2
+    offset_width = (new_width - target_width) // 2
+
+    return resized_image[
         offset_height : offset_height + target_height,
         offset_width : offset_width + target_width,
     ]
@@ -62,7 +70,7 @@ def resize(component, target_height, target_width):
         component, (int(target_height), int(target_width)), method='bilinear'
     )
 
-def preprocess_augmentation_img(image, height=800, width=1400):
+def preprocess_augmentation_img(image, height=200, width=350):
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_brightness(image, max_delta=0.3)
@@ -119,14 +127,14 @@ def preprocess_augmentation_img(image, height=800, width=1400):
         'B_Input': b_resized
     }
     
-def preprocess_img(image, height=800, width=1400):
-    imageCrop = crop(image, height, width)
+def preprocess_img(image, height=200, width=350):
+    # imageCrop = crop(image, height, width)
     
-    r_channel = imageCrop[..., 0]
-    g_channel = imageCrop[..., 1]
-    b_channel = imageCrop[..., 2]
+    r_channel = image[..., 0]
+    g_channel = image[..., 1]
+    b_channel = image[..., 2]
     
-    image = tf.image.rgb_to_grayscale(imageCrop)
+    image = tf.image.rgb_to_grayscale(image)
     imgScharr = scharr(image)
     imgSobel = sobel(image)
     imgGabor = gabor(image)
