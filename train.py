@@ -164,11 +164,11 @@ def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size
 
 def combine_generator(augmented_generator, generator):
     while True:
-        X_aug, y_aug = augmented_generator.next()
-        X, y = generator.next()
+        X_aug, y_aug = next(augmented_generator)
+        X_no_aug, y_no_aug = next(generator)
 
-        X_combined = np.concatenate([X_aug, X], axis=0)
-        y_combined = np.concatenate([y_aug, y], axis=0)
+        X_combined = np.concatenate([X_aug, X_no_aug], axis=0)
+        y_combined = np.concatenate([y_aug, y_no_aug], axis=0)
 
         yield X_combined, y_combined
 
