@@ -37,6 +37,7 @@ def main(args):
     loadCheckpoint = args.loadCheckpoint
     ResNet = args.ResNet
     
+    unfreeze_layers = args.unfreeze_layers
     
     HEIGHT = args.height
     WIDTH = args.width
@@ -51,7 +52,7 @@ def main(args):
             
     checkpointPathModel = f"{checkpointPath}/model.keras"
     
-    model = get_model(loadCheckpoint, checkpointPathModel, ResNet, HEIGHT, WIDTH)
+    model = get_model(loadCheckpoint, checkpointPathModel, ResNet, unfreeze_layers, HEIGHT, WIDTH)
 
     model.compile(
         loss='binary_crossentropy',
@@ -175,6 +176,8 @@ def parse_arguments(argv):
     parser.add_argument('--batch_size', type=int, help='Batch size for epoch in training', default=32)
     parser.add_argument('--height', type=int, help='Image height resize', default=800)
     parser.add_argument('--width', type=int, help='Image width resize', default=1400)
+    
+    parser.add_argument('--unfreeze_layers', type=int, help='Number of layers to unfreeze in the ResNet model', default=0)
     
     parser.add_argument('--learning_rate', type=float, help='Model learning rate for iteration', default=1e-3)
     

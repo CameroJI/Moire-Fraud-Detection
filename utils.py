@@ -40,19 +40,17 @@ def gabor(img, ksize=31, sigma=6.0, theta=0, lambd=4.0, gamma=0.2, psi=0.0):
 
 def crop(image, target_height, target_width):
     image = tf.convert_to_tensor(image)
-    
+
     original_height = tf.shape(image)[0]
     original_width = tf.shape(image)[1]
-    
+
     offset_height = (original_height - target_height) // 2
     offset_width = (original_width - target_width) // 2
-    
-    cropped_image = image[
-        offset_height:offset_height + target_height,
-        offset_width:offset_width + target_width,
+
+    return image[
+        offset_height : offset_height + target_height,
+        offset_width : offset_width + target_width,
     ]
-    
-    return cropped_image
 
 def wavelet_function(img):
     coeffs2 = pywt.wavedec2(img, 'bior2.2', level=3)
@@ -60,8 +58,9 @@ def wavelet_function(img):
     return LL, LH, HL, HH
 
 def resize(component, target_height, target_width):
-    component_resized = tf.image.resize(component, (int(target_height), int(target_width)), method='bilinear')
-    return component_resized
+    return tf.image.resize(
+        component, (int(target_height), int(target_width)), method='bilinear'
+    )
 
 def preprocess_augmentation_img(image, height=800, width=1400):
     image = tf.image.random_flip_left_right(image)
@@ -172,16 +171,20 @@ def preprocess_img(image, height=800, width=1400):
         'B_Input': b_resized
     }
     
-def get_model(loadFlag, path, ResNet50=False, height=800, width=1400):
-    if loadFlag:
-        model = load_model(path)
-    else:
-        if not ResNet50:
-            model = create_model(height=int(height/8), width=int(width/8), depth=1)
-        else:
-            model = model_renNet(height=height, width=width, depth=3)
+def get_model(loadFlag, path, ResNet50=False, unfreeze_layers=0, height=800, width=1400):
+    if not loadFlag:
+        return (
+            model_renNet(height=height, width=width, depth=3) if ResNet50 else create_model(height=int(height / 8), width=int(width / 8), depth=1))
+    model = load_model(path)
+
+    if unfreeze_layers != 0:
+        for layer in model.layers:
+            layer.trainable = False
+            
+        for layer in model.layers[-unfreeze_layers:]:
+            layer.trainable = True
+
     return model
 
 def load_img(path, height=800, width=1400):
-    img = image.load_img(path, target_size=(height, width))
-    return img
+    return image.load_img(path, target_size=(height, width))
