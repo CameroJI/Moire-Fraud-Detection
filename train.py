@@ -69,7 +69,7 @@ def main(args):
     X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2)
 
     train_generator_aug, train_generator, val_generator = get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size)
-    combined_generator = combined_generator(train_generator_aug, train_generator)
+    combined_generator = combine_generator(train_generator_aug, train_generator)
     
     model.fit(
         combined_generator,
@@ -162,7 +162,7 @@ def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size
         
     return train_generator_aug, train_generator, val_generator
 
-def combined_generator(augmented_generator, generator):
+def combine_generator(augmented_generator, generator):
     while True:
         X_aug, y_aug = augmented_generator.next()
         X, y = generator.next()
