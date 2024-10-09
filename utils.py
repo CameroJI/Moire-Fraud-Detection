@@ -94,17 +94,17 @@ def preprocess_augmentation_img(image, height=800, width=1400):
     g_tensor = np.expand_dims(g_channel, axis=-1)
     b_tensor = np.expand_dims(b_channel, axis=-1)
     
-    LL_resized = resize(LL_tensor, height/8, width/8)
-    LH_resized = resize(LH_tensor, height/8, width/8)
-    HL_resized = resize(HL_tensor, height/8, width/8)
-    HH_resized = resize(HH_tensor, height/8, width/8)
-    imgScharr_resized = resize(imgScharr_tensor, height/8, width/8)
-    imgSobel_resized= resize(imgSobel_tensor, height/8, width/8)
-    imgGabor_resized = resize(imgGabor_tensor, height/8, width/8)
+    LL_resized = resize(LL_tensor, height, width)
+    LH_resized = resize(LH_tensor, height, width)
+    HL_resized = resize(HL_tensor, height, width)
+    HH_resized = resize(HH_tensor, height, width)
+    imgScharr_resized = resize(imgScharr_tensor, height, width/8)
+    imgSobel_resized= resize(imgSobel_tensor, height, width)
+    imgGabor_resized = resize(imgGabor_tensor, height, width)
 
-    r_resized = resize(r_tensor, height/8, width/8)
-    g_resized = resize(g_tensor, height/8, width/8)
-    b_resized = resize(b_tensor, height/8, width/8)
+    r_resized = resize(r_tensor, height, width)
+    g_resized = resize(g_tensor, height, width)
+    b_resized = resize(b_tensor, height, width)
         
     return {
         'LL_Input': LL_resized,
@@ -146,17 +146,17 @@ def preprocess_img(image, height=800, width=1400):
     g_tensor = np.expand_dims(g_channel, axis=-1)
     b_tensor = np.expand_dims(b_channel, axis=-1)
     
-    LL_resized = resize(LL_tensor, height/8, width/8)
-    LH_resized = resize(LH_tensor, height/8, width/8)
-    HL_resized = resize(HL_tensor, height/8, width/8)
-    HH_resized = resize(HH_tensor, height/8, width/8)
-    imgScharr_resized = resize(imgScharr_tensor, height/8, width/8)
-    imgSobel_resized= resize(imgSobel_tensor, height/8, width/8)
-    imgGabor_resized = resize(imgGabor_tensor, height/8, width/8)
+    LL_resized = resize(LL_tensor, height, width)
+    LH_resized = resize(LH_tensor, height, width)
+    HL_resized = resize(HL_tensor, height, width)
+    HH_resized = resize(HH_tensor, height, width)
+    imgScharr_resized = resize(imgScharr_tensor, height, width/8)
+    imgSobel_resized= resize(imgSobel_tensor, height, width)
+    imgGabor_resized = resize(imgGabor_tensor, height, width)
 
-    r_resized = resize(r_tensor, height/8, width/8)
-    g_resized = resize(g_tensor, height/8, width/8)
-    b_resized = resize(b_tensor, height/8, width/8)
+    r_resized = resize(r_tensor, height, width)
+    g_resized = resize(g_tensor, height, width)
+    b_resized = resize(b_tensor, height, width)
         
     return {
         'LL_Input': LL_resized,
@@ -174,7 +174,7 @@ def preprocess_img(image, height=800, width=1400):
 def get_model(loadFlag, path, ResNet50=False, unfreeze_layers=0, height=800, width=1400):
     if not loadFlag:
         return (
-            model_renNet(height=height, width=width, depth=3) if ResNet50 else create_model(height=int(height / 8), width=int(width / 8), depth=1))
+            model_renNet(height=height, width=width, depth=3) if ResNet50 else create_model(height=int(height), width=int(width), depth=1))
     model = load_model(path)
 
     if unfreeze_layers > 0:
