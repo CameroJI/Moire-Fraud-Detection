@@ -177,12 +177,9 @@ def get_model(loadFlag, path, ResNet50=False, unfreeze_layers=0, height=800, wid
             model_renNet(height=height, width=width, depth=3) if ResNet50 else create_model(height=int(height / 8), width=int(width / 8), depth=1))
     model = load_model(path)
 
-    if unfreeze_layers != 0:
-        for layer in model.layers:
-            layer.trainable = False
-            
-        for layer in model.layers[-unfreeze_layers:]:
-            layer.trainable = True
+    if unfreeze_layers > 0:
+        for i, layer in enumerate(model.layers):
+            layer.trainable = i >= len(model.layers) - unfreeze_layers
 
     return model
 
