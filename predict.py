@@ -27,7 +27,7 @@ def main(args):
     print(prediction_label)
 
 def predict_img(model, img, ResNet=False):
-    if ResNet:
+    if not ResNet:
         prediction = model.predict({
             'LL_Input': np.expand_dims(img['LL_Input'], axis=0),
             'LH_Input': np.expand_dims(img['LH_Input'], axis=0),
