@@ -3,7 +3,7 @@ from tensorflow.keras.models import Model # type: ignore
 from tensorflow.keras.applications import ResNet50 # type: ignore
 from keras.layers import Input, Conv2D, Dense, Concatenate, Flatten, MaxPooling2D, Dropout # type: ignore
 
-def create_model(height, width, depth=1):
+def create_model(height, width):
     input_LL = Input(shape=(height, width, 1), name='LL_Input')
     input_HL = Input(shape=(height, width, 1), name='HL_Input')
     input_LH = Input(shape=(height, width, 1), name='LH_Input')
@@ -22,7 +22,7 @@ def create_model(height, width, depth=1):
         x = MaxPooling2D((2, 2))(x)
         return Flatten()(x)
 
-    # Convertir entradas de 1 canal a 3 canales usando convoluciones 1x1
+    # Convertir las entradas de 1 canal a 3 canales
     input_LL_rgb = Conv2D(3, (1, 1), padding='same')(input_LL)
     input_HL_rgb = Conv2D(3, (1, 1), padding='same')(input_HL)
     input_LH_rgb = Conv2D(3, (1, 1), padding='same')(input_LH)
@@ -32,7 +32,6 @@ def create_model(height, width, depth=1):
     input_Sobel_rgb = Conv2D(3, (1, 1), padding='same')(input_Sobel)
     input_Gabor_rgb = Conv2D(3, (1, 1), padding='same')(input_Gabor)
 
-    # Aplicar el bloque de convolución a cada entrada
     x_LL = conv_block(input_LL_rgb)
     x_HL = conv_block(input_HL_rgb)
     x_LH = conv_block(input_LH_rgb)
@@ -44,7 +43,6 @@ def create_model(height, width, depth=1):
 
     x_RGB = conv_block(input_RGB)
 
-    # Concatenar todas las salidas
     concatenated = Concatenate()([x_LL, x_HL, x_LH, x_HH, x_Scharr, x_Sobel, x_Gabor, x_RGB])
 
     x = Dense(128, activation='relu')(concatenated)
