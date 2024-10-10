@@ -138,24 +138,26 @@ def preprocess_img(image, height=200, width=350):
     LH_tensor = np.expand_dims(LH, axis=-1)
     HL_tensor = np.expand_dims(HL, axis=-1)
     HH_tensor = np.expand_dims(HH, axis=-1)
+    
     imgScharr_tensor = np.expand_dims(imgScharr, axis=-1)
     imgSobel_tensor = np.expand_dims(imgSobel, axis=-1)
     imgGabor_tensor = np.expand_dims(imgGabor, axis=-1)
+    
     r_tensor = np.expand_dims(r_channel, axis=-1)
     g_tensor = np.expand_dims(g_channel, axis=-1)
     b_tensor = np.expand_dims(b_channel, axis=-1)
+    rgb_tensor = np.concatenate([r_tensor, g_tensor, b_tensor], axis=-1)
     
     LL_resized = resize(LL_tensor, height, width)
     LH_resized = resize(LH_tensor, height, width)
     HL_resized = resize(HL_tensor, height, width)
     HH_resized = resize(HH_tensor, height, width)
+    
     imgScharr_resized = resize(imgScharr_tensor, height, width)
     imgSobel_resized = resize(imgSobel_tensor, height, width)
     imgGabor_resized = resize(imgGabor_tensor, height, width)
     
-    r_resized = resize(r_tensor, height, width)
-    g_resized = resize(g_tensor, height, width)
-    b_resized = resize(b_tensor, height, width)
+    rgb_resized = resize(rgb_tensor, height, width)
 
     return {
         'LL_Input': LL_resized,
@@ -165,9 +167,7 @@ def preprocess_img(image, height=200, width=350):
         'Scharr_Input': imgScharr_resized,
         'Sobel_Input': imgSobel_resized,
         'Gabor_Input': imgGabor_resized,
-        'R_Input': r_resized,
-        'G_Input': g_resized,
-        'B_Input': b_resized
+        'RGB_Input': rgb_resized,
     }
     
 def get_model(loadFlag, path, ResNet50=False, unfreeze_layers=0, height=800, width=1400):
