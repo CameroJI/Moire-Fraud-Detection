@@ -119,7 +119,8 @@ def preprocess_augmentation_img(image, height=200, width=350):
         'B_Input': b_resized
     }
     
-def preprocess_img(image, height=200, width=350):    
+def preprocess_img(image, height=200, width=350):
+    image = tf.convert_to_tensor(image)  
     r_channel = image[..., 0]
     g_channel = image[..., 1]
     b_channel = image[..., 2]
