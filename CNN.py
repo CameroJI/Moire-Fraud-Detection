@@ -33,14 +33,15 @@ def create_model(height, width, depth):
     x_Sobel = conv_block(input_Sobel)
     x_Gabor = conv_block(input_Gabor)
 
-    x_R = conv_block(input_R)
-    x_G = conv_block(input_G)
-    x_B = conv_block(input_B)
+    input_RGB = Concatenate(axis=-1)([input_R, input_G, input_B])
+    x_RGB = conv_block(input_RGB)
 
-    concatenated = Concatenate()([x_LL, x_HL, x_LH, x_HH, x_Scharr, x_Sobel, x_Gabor, x_R, x_G, x_B])
+    concatenated = Concatenate()([
+        x_LL, x_HL, x_LH, x_HH, x_Scharr, x_Sobel, x_Gabor, x_RGB
+    ])
 
     x = Dense(128, activation='relu')(concatenated)
-    x = Dropout(0.5)(x)  # Dropout del 50% para evitar sobreajuste
+    x = Dropout(0.5)(x)
     x = Dense(64, activation='relu')(x)
     x = Dropout(0.5)(x)
     predictions = Dense(1, activation='sigmoid')(x)
