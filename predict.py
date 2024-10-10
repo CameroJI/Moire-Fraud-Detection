@@ -36,7 +36,9 @@ def predict_img(model, img, ResNet=False):
             'Scharr_Input': np.expand_dims(img['Scharr_Input'], axis=0),
             'Sobel_Input': np.expand_dims(img['Sobel_Input'], axis=0),
             'Gabor_Input': np.expand_dims(img['Gabor_Input'], axis=0),
-            'RGB_Input': np.expand_dims(img['RGB_Input'], axis=0)
+            'R_Input': np.expand_dims(img['R_Input'], axis=0),
+            'G_Input': np.expand_dims(img['G_Input'], axis=0),
+            'B_Input': np.expand_dims(img['B_Input'], axis=0)
         }, verbose=0)
 
     else:
