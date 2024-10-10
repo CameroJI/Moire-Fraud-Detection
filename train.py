@@ -94,22 +94,17 @@ def load_data(datasetPath):
 def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size, dataset_augmentation=False):
     if not ResNet:
         if dataset_augmentation:
-            train_generator = CustomImageDataGenerator(
-                image_paths=X_train,
-                labels=y_train,
-                batch_size=batch_size,
-                image_size=image_size,
-                preprocess_function=preprocess_augmentation_img,
-                class_mode='binary'
-            )
+                       preprocess_function = lambda image: preprocess_augmentation_img(image, height=HEIGHT, width=WIDTH)
         else:
-            train_generator = CustomImageDataGenerator(
-                image_paths=X_train,
-                labels=y_train,
-                batch_size=batch_size,
-                image_size=image_size,
-                preprocess_function=preprocess_img,
-                class_mode='binary'
+           preprocess_function = lambda image: preprocess_img(image, height=HEIGHT, width=WIDTH)
+            
+        train_generator = CustomImageDataGenerator(
+            image_paths=X_train,
+            labels=y_train,
+            batch_size=batch_size,
+            image_size=image_size,
+            preprocess_function=preprocess_function,
+            class_mode='binary'
             )
 
         val_generator = CustomImageDataGenerator(
