@@ -22,19 +22,24 @@ def create_model(height, width, depth):
         x = MaxPooling2D((2, 2))(x)
         return Flatten()(x)
 
-    x_LL = conv_block(input_LL)
-    x_HL = conv_block(input_HL)
-    x_LH = conv_block(input_LH)
-    x_HH = conv_block(input_HH)
-    x_Scharr = conv_block(input_Scharr)
-    x_Sobel = conv_block(input_Sobel)
-    x_Gabor = conv_block(input_Gabor)
+    input_LL_rgb = Conv2D(3, (1, 1), padding='same')(input_LL)
+    input_HL_rgb = Conv2D(3, (1, 1), padding='same')(input_HL)
+    input_LH_rgb = Conv2D(3, (1, 1), padding='same')(input_LH)
+    input_HH_rgb = Conv2D(3, (1, 1), padding='same')(input_HH)
+    input_Scharr_rgb = Conv2D(3, (1, 1), padding='same')(input_Scharr)
+    input_Sobel_rgb = Conv2D(3, (1, 1), padding='same')(input_Sobel)
+    input_Gabor_rgb = Conv2D(3, (1, 1), padding='same')(input_Gabor)
 
-    x_RGB = Conv2D(32, (3, 3), activation='relu', padding='same')(input_RGB)
-    x_RGB = MaxPooling2D((2, 2))(x_RGB)
-    x_RGB = Conv2D(64, (3, 3), activation='relu', padding='same')(x_RGB)
-    x_RGB = MaxPooling2D((2, 2))(x_RGB)
-    x_RGB = Flatten()(x_RGB)
+    x_LL = conv_block(input_LL_rgb)
+    x_HL = conv_block(input_HL_rgb)
+    x_LH = conv_block(input_LH_rgb)
+    x_HH = conv_block(input_HH_rgb)
+    
+    x_Scharr = conv_block(input_Scharr_rgb)
+    x_Sobel = conv_block(input_Sobel_rgb)
+    x_Gabor = conv_block(input_Gabor_rgb)
+
+    x_RGB = conv_block(input_RGB)
 
     concatenated = Concatenate()([x_LL, x_HL, x_LH, x_HH, x_Scharr, x_Sobel, x_Gabor, x_RGB])
 
