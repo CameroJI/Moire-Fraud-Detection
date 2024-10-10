@@ -2,8 +2,9 @@ import os
 import argparse
 from PIL import Image
 import numpy as np
-from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
+from tensorflow.keras.preprocessing.image import ImageDataGenerator  # type: ignore
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
 
 def augment_image(image_path, output_dir, augmentor, augment_count=1):
     img = Image.open(image_path)
@@ -53,15 +54,15 @@ def process_folder(input_dir, output_dir, augment_count=1, max_workers=4):
         original_images = 0
         augmented_images_total = 0
 
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        image_files = [f for f in os.listdir(category_path) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+        
+        with ThreadPoolExecutor(max_workers=max_workers) as executor, tqdm(total=len(image_files), desc=f"Processing {category}") as pbar:
             futures = []
 
-            for filename in os.listdir(category_path):
-                if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
-                    image_path = os.path.join(category_path, filename)
-                    output_image_path = os.path.join(output_category_path, filename)
-
-                    futures.append(executor.submit(process_image, image_path, output_image_path, augmentor, augment_count))
+            for filename in image_files:
+                image_path = os.path.join(category_path, filename)
+                output_image_path = os.path.join(output_category_path, filename)
+                futures.append(executor.submit(process_image, image_path, output_image_path, augmentor, augment_count))
 
             for future in as_completed(futures):
                 try:
@@ -70,6 +71,7 @@ def process_folder(input_dir, output_dir, augment_count=1, max_workers=4):
                     original_images += 1
                 except Exception as e:
                     print(f"Error processing image: {e}")
+                pbar.update(1)
 
         print(f"Category '{category}' - Original images: {original_images}, Augmented images: {augmented_images_total}")
 
