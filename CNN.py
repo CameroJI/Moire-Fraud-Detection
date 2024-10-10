@@ -3,7 +3,7 @@ from tensorflow.keras.models import Model # type: ignore
 from tensorflow.keras.applications import ResNet50 # type: ignore
 from keras.layers import Input, Conv2D, Dense, Concatenate, Flatten, MaxPooling2D, Dropout # type: ignore
 
-def create_model(height, width):
+def create_model(height, width, depth):
     input_LL = Input(shape=(height, width, 1), name='LL_Input')
     input_HL = Input(shape=(height, width, 1), name='HL_Input')
     input_LH = Input(shape=(height, width, 1), name='LH_Input')
