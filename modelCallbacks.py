@@ -47,9 +47,7 @@ class CustomImageDataGenerator(tf.keras.utils.Sequence):
             'Scharr_Input': [],
             'Sobel_Input': [],
             'Gabor_Input': [],
-            'R_Input': [],
-            'G_Input': [],
-            'B_Input': []
+            'RGB_Input': []
         }
         
         for image_path in batch_image_paths:
