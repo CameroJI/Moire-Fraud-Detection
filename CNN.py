@@ -41,9 +41,9 @@ def create_model(height, width, depth):
     ])
 
     x = Dense(128, activation='relu')(concatenated)
-    x = Dropout(0.5)(x)
+    x = Dropout(0.2)(x)
     x = Dense(64, activation='relu')(x)
-    x = Dropout(0.5)(x)
+    x = Dropout(0.2)(x)
     predictions = Dense(1, activation='sigmoid')(x)
 
     return Model(inputs=[input_LL, input_HL, input_LH, input_HH, input_Scharr, input_Sobel, input_Gabor, input_R, input_G, input_B], outputs=predictions)
