@@ -97,6 +97,8 @@ def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size
                        preprocess_function = lambda image: preprocess_augmentation_img(image, height=HEIGHT, width=WIDTH)
         else:
            preprocess_function = lambda image: preprocess_img(image, height=HEIGHT, width=WIDTH)
+           
+        valid_preprocess_function = lambda image: preprocess_img(image, height=HEIGHT, width=WIDTH)
             
         train_generator = CustomImageDataGenerator(
             image_paths=X_train,
@@ -112,7 +114,7 @@ def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size
             labels=y_val,
             batch_size=batch_size,
             image_size=image_size,
-            preprocess_function=preprocess_img,
+            preprocess_function=valid_preprocess_function,
             class_mode='binary'
         )
     else:
