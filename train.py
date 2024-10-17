@@ -10,7 +10,7 @@ from os import makedirs, walk
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint # type: ignore
 
-from utils import preprocess_img, preprocess_augmentation_img, get_model
+from utils import preprocess_img, preprocess_augmentation_img, get_model, detect_left_face
 from modelCallbacks import BatchCheckpointCallback, CustomImageDataGenerator
 
 warnings.filterwarnings('ignore', category=UserWarning)

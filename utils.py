@@ -8,6 +8,8 @@ from tensorflow.keras.preprocessing import image # type: ignore
 
 from CNN import create_model, create_new_model
 
+mp_face_detection = mp.solutions.face_detection
+detector = mp_face_detection.FaceDetection(min_detection_confidence=0.4)
 def scharr(img):
     image_np = img.numpy()
 
@@ -121,10 +123,12 @@ def preprocess_augmentation_img(image, height=200, width=350):
     }
     
 def preprocess_img(image, height=200, width=350):
+    img_crop = tf.convert_to_tensor(detect_left_face(image))
+            
     image = tf.convert_to_tensor(image)  
-    r_channel = image[..., 0]
-    g_channel = image[..., 1]
-    b_channel = image[..., 2]
+    r_channel = img_crop[..., 0]
+    g_channel = img_crop[..., 1]
+    b_channel = img_crop[..., 2]
     
     image = tf.image.rgb_to_grayscale(image)
     imgScharr = scharr(image)
@@ -185,3 +189,18 @@ def get_model(loadFlag, path, unfreeze_layers=0, height=800, width=1400):
 
 def load_img(path, height=800, width=1400):
     return image.load_img(path, target_size=(height, width))
+
+def detect_left_face(image):
+    results = detector.process(image)
+
+    if results.detections is None:
+        return None
+    for detection in results.detections:
+        bboxC = detection.location_data.relative_bounding_box
+        h, w, _ = image.shape
+        h_prop, y_prop = (int(h/10), int(y/2))
+        x, y, width, height = (bboxC.xmin * w, bboxC.ymin * h, bboxC.width * w, bboxC.height * h)
+        if x < h/2:
+            img_crop = image[int(y)-y_prop:int(y + height)+y_prop, int(x)-h_prop:int(x + width)+h_prop]
+            
+    return img_crop
