@@ -1,5 +1,6 @@
 import cv2
 import pywt
+import random
 import numpy as np
 import tensorflow as tf
 import mediapipe as mp
@@ -66,14 +67,21 @@ def resize(component, target_height, target_width):
     )
 
 def preprocess_augmentation_img(image, height=200, width=350):
-    image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_flip_up_down(image)
-    image = tf.image.random_brightness(image, max_delta=0.3)
+    if random.random() > 0.5: 
+        image = tf.image.flip_up_down(image)
+    image = tf.image.random_brightness(image, max_delta=0.5)
     image = tf.image.random_contrast(image, lower=0.65, upper=1.35)
-        
-    r_channel = image[..., 0]
-    g_channel = image[..., 1]
-    b_channel = image[..., 2]
+    image = tf.image.random_hue(image, max_delta=0.2)
+    
+    img_crop = detect_left_face(image)
+    if img_crop is not None:
+        r_channel = img_crop[..., 0]
+        g_channel = img_crop[..., 1]
+        b_channel = img_crop[..., 2]
+    else:
+        r_channel = image[..., 0]
+        g_channel = image[..., 1]
+        b_channel = image[..., 2]
     
     image = tf.image.rgb_to_grayscale(image)
     imgScharr = scharr(image)
@@ -81,9 +89,9 @@ def preprocess_augmentation_img(image, height=200, width=350):
     imgGabor = gabor(image)
     image = tf.image.per_image_standardization(image)
     image = tf.squeeze(image, axis=-1)
-    
+
     LL, LH, HL, HH = wavelet_function(image)
-    
+
     LL_tensor = np.expand_dims(LL, axis=-1)
     LH_tensor = np.expand_dims(LH, axis=-1)
     HL_tensor = np.expand_dims(HL, axis=-1)
@@ -100,13 +108,13 @@ def preprocess_augmentation_img(image, height=200, width=350):
     HL_resized = resize(HL_tensor, height, width)
     HH_resized = resize(HH_tensor, height, width)
     imgScharr_resized = resize(imgScharr_tensor, height, width)
-    imgSobel_resized= resize(imgSobel_tensor, height, width)
+    imgSobel_resized = resize(imgSobel_tensor, height, width)
     imgGabor_resized = resize(imgGabor_tensor, height, width)
-
+    
     r_resized = resize(r_tensor, height, width)
     g_resized = resize(g_tensor, height, width)
     b_resized = resize(b_tensor, height, width)
-        
+
     return {
         'LL_Input': LL_resized,
         'LH_Input': LH_resized,
@@ -198,12 +206,15 @@ def detect_left_face(img):
 
     if results.detections is None:
         return None
+    
     for detection in results.detections:
         bboxC = detection.location_data.relative_bounding_box
         h, w, _ = img_array.shape
         x, y, width, height = (bboxC.xmin * w, bboxC.ymin * h, bboxC.width * w, bboxC.height * h)
-        h_prop, y_prop = (int(h/5), int(y/2))
+        h_prop, y_prop = (int(h/10), int(y/2))
         if x < h/2:
             img_crop = img_array[int(y)-y_prop:int(y + height)+y_prop, int(x)-h_prop:int(x + width)+h_prop]
+        else:
+            return None
             
     return img_crop
