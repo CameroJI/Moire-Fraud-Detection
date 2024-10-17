@@ -70,9 +70,7 @@ def preprocess_augmentation_img(image, height=200, width=350):
     image = tf.image.random_flip_up_down(image)
     image = tf.image.random_brightness(image, max_delta=0.3)
     image = tf.image.random_contrast(image, lower=0.65, upper=1.35)
-    
-    # imageCrop = crop(image, height, width)
-    
+        
     r_channel = image[..., 0]
     g_channel = image[..., 1]
     b_channel = image[..., 2]
@@ -123,13 +121,17 @@ def preprocess_augmentation_img(image, height=200, width=350):
     }
     
 def preprocess_img(image, height=200, width=350):
-    img_crop = tf.convert_to_tensor(detect_left_face(image))
-            
+    img_crop = detect_left_face(image)
     image = tf.convert_to_tensor(image)  
-    r_channel = img_crop[..., 0]
-    g_channel = img_crop[..., 1]
-    b_channel = img_crop[..., 2]
-    
+    if img_crop is not None:
+        r_channel = img_crop[..., 0]
+        g_channel = img_crop[..., 1]
+        b_channel = img_crop[..., 2]
+    else:
+        r_channel = image[..., 0]
+        g_channel = image[..., 1]
+        b_channel = image[..., 2]
+   
     image = tf.image.rgb_to_grayscale(image)
     imgScharr = scharr(image)
     imgSobel = sobel(image)
@@ -190,17 +192,18 @@ def get_model(loadFlag, path, unfreeze_layers=0, height=800, width=1400):
 def load_img(path, height=800, width=1400):
     return image.load_img(path, target_size=(height, width))
 
-def detect_left_face(image):
-    results = detector.process(image)
+def detect_left_face(img):
+    img_array = np.array(image.img_to_array(img)).astype(np.uint8)
+    results = detector.process(img_array)
 
     if results.detections is None:
         return None
     for detection in results.detections:
         bboxC = detection.location_data.relative_bounding_box
-        h, w, _ = image.shape
-        h_prop, y_prop = (int(h/10), int(y/2))
+        h, w, _ = img_array.shape
         x, y, width, height = (bboxC.xmin * w, bboxC.ymin * h, bboxC.width * w, bboxC.height * h)
+        h_prop, y_prop = (int(h/5), int(y/2))
         if x < h/2:
-            img_crop = image[int(y)-y_prop:int(y + height)+y_prop, int(x)-h_prop:int(x + width)+h_prop]
+            img_crop = img_array[int(y)-y_prop:int(y + height)+y_prop, int(x)-h_prop:int(x + width)+h_prop]
             
     return img_crop
