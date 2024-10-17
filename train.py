@@ -8,7 +8,6 @@ import tensorflow as tf
 from os.path import exists
 from os import makedirs, walk
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.preprocessing.image import ImageDataGenerator # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint # type: ignore
 
 from utils import preprocess_img, preprocess_augmentation_img, get_model
