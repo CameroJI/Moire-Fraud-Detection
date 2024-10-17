@@ -2,6 +2,7 @@ import cv2
 import pywt
 import numpy as np
 import tensorflow as tf
+import mediapipe as mp
 from keras.models import load_model # type: ignore
 from tensorflow.keras.preprocessing import image # type: ignore
 

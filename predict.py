@@ -3,7 +3,6 @@ import sys
 import warnings
 import argparse
 import numpy as np
-from tensorflow.keras.utils import img_to_array # type: ignore
 
 from utils import preprocess_img, get_model, load_img
 
