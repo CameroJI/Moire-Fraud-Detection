@@ -1,6 +1,5 @@
 from keras.models import Model # type: ignore
 from tensorflow.keras.models import Model # type: ignore
-from tensorflow.keras.applications import ResNet50 # type: ignore
 from keras.layers import Input, Conv2D, Dense, Concatenate, Flatten, MaxPooling2D, Dropout # type: ignore
 
 def create_model(height, width, depth):
@@ -47,19 +46,3 @@ def create_model(height, width, depth):
     predictions = Dense(1, activation='sigmoid')(x)
 
     return Model(inputs=[input_LL, input_HL, input_LH, input_HH, input_Scharr, input_Sobel, input_Gabor, input_R, input_G, input_B], outputs=predictions)
-
-def model_renNet(height, width, depth):
-    base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(height, width, depth))
-
-    for layer in base_model.layers:
-        layer.trainable = False
-
-    x = base_model.output
-    x = Flatten()(x)
-    x = Dense(1024, activation='relu')(x)
-    predictions = Dense(1, activation='sigmoid')(x)
-
-    # for layer in base_model.layers[-10:]:
-    #     layer.trainable = True
-
-    return Model(inputs=base_model.input, outputs=predictions)

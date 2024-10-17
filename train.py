@@ -35,7 +35,6 @@ def main(args):
     
     checkpointPath = args.checkpointPath
     loadCheckpoint = args.loadCheckpoint
-    ResNet = args.ResNet
     dataset_augmentation = args.dataset_augmentation
     
     unfreeze_layers = args.unfreeze_layers
@@ -53,7 +52,7 @@ def main(args):
             
     checkpointPathModel = f"{checkpointPath}/model.keras"
     
-    model = get_model(loadCheckpoint, checkpointPathModel, ResNet, unfreeze_layers, HEIGHT, WIDTH)
+    model = get_model(loadCheckpoint, checkpointPathModel, unfreeze_layers, HEIGHT, WIDTH)
 
     model.compile(
         loss='binary_crossentropy',
@@ -69,7 +68,7 @@ def main(args):
     images, labels = load_data(datasetPath)
     X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2)
 
-    train_generator, val_generator = get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size, dataset_augmentation)
+    train_generator, val_generator = get_generator(X_train, y_train, X_val, y_val, batch_size, image_size, dataset_augmentation)
     
     model.fit(
         train_generator,
@@ -91,75 +90,30 @@ def load_data(datasetPath):
             labels.append(0 if folder == 'Reales' else 1)
     return np.array(images), np.array(labels)
 
-def get_generator(ResNet, X_train, y_train, X_val, y_val, batch_size, image_size, dataset_augmentation=False):
-    if not ResNet:
-        if dataset_augmentation:
-                       preprocess_function = lambda image: preprocess_augmentation_img(image, height=HEIGHT, width=WIDTH)
-        else:
-           preprocess_function = lambda image: preprocess_img(image, height=HEIGHT, width=WIDTH)
-           
-        valid_preprocess_function = lambda image: preprocess_img(image, height=HEIGHT, width=WIDTH)
-            
-        train_generator = CustomImageDataGenerator(
-            image_paths=X_train,
-            labels=y_train,
-            batch_size=batch_size,
-            image_size=image_size,
-            preprocess_function=preprocess_function,
-            class_mode='binary'
-            )
-
-        val_generator = CustomImageDataGenerator(
-            image_paths=X_val,
-            labels=y_val,
-            batch_size=batch_size,
-            image_size=image_size,
-            preprocess_function=valid_preprocess_function,
-            class_mode='binary'
-        )
+def get_generator(X_train, y_train, X_val, y_val, batch_size, image_size, dataset_augmentation=False):
+    if dataset_augmentation:
+                    preprocess_function = lambda image: preprocess_augmentation_img(image, height=HEIGHT, width=WIDTH)
     else:
-        train_df = pd.DataFrame({'filename': X_train, 'label': y_train})
-        val_df = pd.DataFrame({'filename': X_val, 'label': y_val})
+        preprocess_function = lambda image: preprocess_img(image, height=HEIGHT, width=WIDTH)
         
-        train_df['label'] = train_df['label'].astype(str)
-        val_df['label'] = val_df['label'].astype(str)
+    valid_preprocess_function = lambda image: preprocess_img(image, height=HEIGHT, width=WIDTH)
         
-        if dataset_augmentation:
-            train_datagen = ImageDataGenerator(
-                rotation_range=10,
-                width_shift_range=0.2,
-                height_shift_range=0.2,
-                shear_range=0.2,
-                zoom_range=0.2,
-                horizontal_flip=True,
-                fill_mode='nearest',
-                brightness_range=[0.8, 1.2],
-                channel_shift_range=50,
-            )
-            
-        else:
-            train_datagen = ImageDataGenerator()
-
-        val_datagen = ImageDataGenerator()
-
-        train_generator = train_datagen.flow_from_dataframe(
-            dataframe=train_df,
-            x_col='filename',
-            y_col='label',
-            target_size=(HEIGHT, WIDTH),
-            batch_size=batch_size,
-            class_mode='binary',
-            shuffle=True
+    train_generator = CustomImageDataGenerator(
+        image_paths=X_train,
+        labels=y_train,
+        batch_size=batch_size,
+        image_size=image_size,
+        preprocess_function=preprocess_function,
+        class_mode='binary'
         )
 
-        val_generator = val_datagen.flow_from_dataframe(
-            dataframe=val_df,
-            x_col='filename',
-            y_col='label',
-            target_size=(HEIGHT, WIDTH),
-            batch_size=batch_size,
-            class_mode='binary',
-            shuffle=False
+    val_generator = CustomImageDataGenerator(
+        image_paths=X_val,
+        labels=y_val,
+        batch_size=batch_size,
+        image_size=image_size,
+        preprocess_function=valid_preprocess_function,
+        class_mode='binary'
         )
     
     return train_generator, val_generator
@@ -191,11 +145,10 @@ def parse_arguments(argv):
     parser.add_argument('--height', type=int, help='Image height resize', default=800)
     parser.add_argument('--width', type=int, help='Image width resize', default=1400)
     
-    parser.add_argument('--unfreeze_layers', type=int, help='Number of layers to unfreeze in the ResNet model', default=0)
+    parser.add_argument('--unfreeze_layers', type=int, help='Number of layers to unfreeze in the model', default=0)
     
     parser.add_argument('--learning_rate', type=float, help='Model learning rate for iteration', default=1e-3)
     
-    parser.add_argument('--ResNet', action='store_true', default=False, help='Use ResNet model')
     parser.add_argument('--dataset_augmentation', action='store_true', default=False, help='Use data augmentation on dataset')
     parser.add_argument('--loadCheckpoint', action='store_true', default=False, help='load Checkpoint Model')
 

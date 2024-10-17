@@ -26,26 +26,19 @@ def main(args):
     prediction_label = 'Real' if prediction == 0 else 'Ataque'
     print(prediction_label)
 
-def predict_img(model, img, ResNet=False):
-    if not ResNet:
-        prediction = model.predict({
-            'LL_Input': np.expand_dims(img['LL_Input'], axis=0),
-            'LH_Input': np.expand_dims(img['LH_Input'], axis=0),
-            'HL_Input': np.expand_dims(img['HL_Input'], axis=0),
-            'HH_Input': np.expand_dims(img['HH_Input'], axis=0),
-            'Scharr_Input': np.expand_dims(img['Scharr_Input'], axis=0),
-            'Sobel_Input': np.expand_dims(img['Sobel_Input'], axis=0),
-            'Gabor_Input': np.expand_dims(img['Gabor_Input'], axis=0),
-            'R_Input': np.expand_dims(img['R_Input'], axis=0),
-            'G_Input': np.expand_dims(img['G_Input'], axis=0),
-            'B_Input': np.expand_dims(img['B_Input'], axis=0)
-        }, verbose=0)
-
-    else:
-        img_array = img_to_array(img)
-        img_array = np.expand_dims(img_array, axis=0)
-        # img_array = img_array / 255.0
-        prediction = model.predict(img_array, verbose=0)
+def predict_img(model, img):
+    prediction = model.predict({
+        'LL_Input': np.expand_dims(img['LL_Input'], axis=0),
+        'LH_Input': np.expand_dims(img['LH_Input'], axis=0),
+        'HL_Input': np.expand_dims(img['HL_Input'], axis=0),
+        'HH_Input': np.expand_dims(img['HH_Input'], axis=0),
+        'Scharr_Input': np.expand_dims(img['Scharr_Input'], axis=0),
+        'Sobel_Input': np.expand_dims(img['Sobel_Input'], axis=0),
+        'Gabor_Input': np.expand_dims(img['Gabor_Input'], axis=0),
+        'R_Input': np.expand_dims(img['R_Input'], axis=0),
+        'G_Input': np.expand_dims(img['G_Input'], axis=0),
+        'B_Input': np.expand_dims(img['B_Input'], axis=0)
+    }, verbose=0)
         
     prediction_bin = (prediction[0] > 0.5).astype(int)[0]
 

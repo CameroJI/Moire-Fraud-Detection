@@ -5,7 +5,7 @@ import tensorflow as tf
 from keras.models import load_model # type: ignore
 from tensorflow.keras.preprocessing import image # type: ignore
 
-from CNN import create_model, model_renNet
+from CNN import create_model
 
 def scharr(img):
     image_np = img.numpy()
@@ -170,10 +170,10 @@ def preprocess_img(image, height=200, width=350):
         'B_Input': b_resized
     }
     
-def get_model(loadFlag, path, ResNet50=False, unfreeze_layers=0, height=800, width=1400):
+def get_model(loadFlag, path, unfreeze_layers=0, height=800, width=1400):
     if not loadFlag:
         return (
-            model_renNet(height=height, width=width, depth=3) if ResNet50 else create_model(height=int(height), width=int(width), depth=1))
+            create_model(height=int(height), width=int(width), depth=1))
     model = load_model(path)
 
     if unfreeze_layers > 0:
