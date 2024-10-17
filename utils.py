@@ -203,7 +203,7 @@ def load_img(path, height=800, width=1400):
 def detect_left_face(img):
     img_array = np.array(image.img_to_array(img)).astype(np.uint8)
     results = detector.process(img_array)
-
+    
     if results.detections is None:
         return None
     
@@ -213,7 +213,7 @@ def detect_left_face(img):
         x, y, width, height = (bboxC.xmin * w, bboxC.ymin * h, bboxC.width * w, bboxC.height * h)
         h_prop, y_prop = (int(h/10), int(y/2))
         if x < h/2:
-            img_crop = img_array[int(y)-y_prop:int(y + height)+y_prop, int(x)-h_prop:int(x + width)+h_prop]
+            img_crop = img_array[max(0, int(y)-y_prop):min(h, int(y + height)+y_prop), max(0, int(x)-h_prop):min(w, int(x + width)+h_prop)]
         else:
             return None
             
