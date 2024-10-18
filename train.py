@@ -61,7 +61,7 @@ def main(args):
     batchCheckpointCallback = BatchCheckpointCallback(batchesNumber=save_iter, path=checkpointPathModel)
     
     early_stopping = EarlyStopping(monitor=monitor, patience=5, restore_best_weights=True, mode=monitor_mode)
-    reduce_lr = ReduceLROnPlateau(monitor=monitor, factor=0.1, patience=3, mode=monitor_mode)
+    reduce_lr = ReduceLROnPlateau(monitor=monitor, factor=0.05, patience=2, mode=monitor_mode)
     checkpoint = ModelCheckpoint(f'{checkpointPath}/best_model.keras', monitor=monitor, save_best_only=True, verbose=1, mode=monitor_mode)
     
     images, labels = load_data(datasetPath)

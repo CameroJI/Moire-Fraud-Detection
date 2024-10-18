@@ -1,6 +1,6 @@
 from keras.models import Model # type: ignore
 from tensorflow.keras.models import Model # type: ignore
-from keras.layers import Input, Conv2D, Dense, Concatenate, Flatten, MaxPooling2D, Dropout, Multiply, Average # type: ignore
+from keras.layers import Input, Conv2D, Dense, Concatenate, Flatten, MaxPooling2D, Dropout, Multiply, Average, BatchNormalization, GlobalAveragePooling2D # type: ignore
 
 def create_model(height, width, depth):
     input_LL = Input(shape=(height, width, depth), name='LL_Input')
@@ -47,16 +47,24 @@ def create_model(height, width, depth):
 
     return Model(inputs=[input_LL, input_HL, input_LH, input_HH, input_Scharr, input_Sobel, input_Gabor, input_R, input_G, input_B], outputs=predictions)
 
-def conv_block(input_tensor, filters):
-    """Bloque convolucional simple."""
+def conv_block(input_tensor, filters, dropout_rate=0.3):
     x = Conv2D(filters, (3, 3), activation='relu', padding='same')(input_tensor)
+    x = BatchNormalization()(x)
+    x = Conv2D(filters, (3, 3), activation='relu', padding='same')(x)
+    x = BatchNormalization()(x)
     x = MaxPooling2D((2, 2))(x)
+    x = Dropout(dropout_rate)(x)
     return x
 
+
 def attention_block(x):
-    """Aplicar atención simple."""
-    attention = Conv2D(x.shape[-1], (1, 1), activation='sigmoid')(x)  # Usar 1x1 para la atención
-    return Multiply()([x, attention])
+    attention = Conv2D(x.shape[-1], (1, 1), activation='relu', padding='same')(x)
+    attention = BatchNormalization()(attention)
+    attention = GlobalAveragePooling2D()(attention)
+    attention = Dense(x.shape[-1], activation='sigmoid')(attention)
+    attention = Multiply()([x, attention])
+    
+    return attention
 
 def create_new_model(height, width, depth):
     input_LL = Input(shape=(height, width, depth), name='LL_Input')
@@ -88,9 +96,9 @@ def create_new_model(height, width, depth):
     avg_output = Average()(branches)
     
     x = Dense(128, activation='relu')(avg_output)
-    x = Dropout(0.2)(x)
+    x = Dropout(0.5)(x)
     x = Dense(64, activation='relu')(x)
-    x = Dropout(0.2)(x)
+    x = Dropout(0.5)(x)
     predictions = Dense(1, activation='sigmoid')(x)
 
     return Model(inputs=[input_LL, input_HL, input_LH, input_HH, input_Scharr, input_Sobel, input_Gabor, input_R, input_G, input_B], outputs=predictions)
