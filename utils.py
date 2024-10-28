@@ -211,7 +211,7 @@ def detect_left_face(img):
         bboxC = detection.location_data.relative_bounding_box
         h, w, _ = img_array.shape
         x, y, width, height = (bboxC.xmin * w, bboxC.ymin * h, bboxC.width * w, bboxC.height * h)
-        h_prop, y_prop = (int(h/10), int(y/2))
+        h_prop, y_prop = (int(h/8), int(y/2))
         if x < h/2:
             img_crop = img_array[max(0, int(y)-y_prop):min(h, int(y + height)+y_prop), max(0, int(x)-h_prop):min(w, int(x + width)+h_prop)]
         else:
