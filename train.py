@@ -87,11 +87,12 @@ def load_data(datasetPath, left_face_only):
         for img_file in img_list:
             img_path = os.path.join(folder_path, img_file)
             images.append(img_path)
-            labels.append(0 if folder == 'Reales' else 1)
             if left_face_only:
                 img = load_img(img_path, width=WIDTH, height=HEIGHT)
                 img_crop = detect_left_face(img=img)
                 labels.append(0 if img_crop is not None else 1)
+            else:
+                labels.append(0 if folder == 'Reales' else 1)
     return np.array(images), np.array(labels)
 
 def get_generator(X_train, y_train, X_val, y_val, batch_size, image_size, dataset_augmentation=False):
