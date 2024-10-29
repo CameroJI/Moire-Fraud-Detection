@@ -2,6 +2,7 @@ import cv2
 import pywt
 import random
 import numpy as np
+from PIL import Image
 import tensorflow as tf
 import mediapipe as mp
 from keras.models import load_model # type: ignore
@@ -197,8 +198,14 @@ def get_model(loadFlag, path, unfreeze_layers=0, height=800, width=1400):
 
     return model
 
-def load_img(path, height=800, width=1400):
-    return image.load_img(path, target_size=(height, width))
+def load_img(input_data, height=800, width=1400):
+    if isinstance(input_data, str):
+        return image.load_img(input_data, target_size=(height, width))
+    elif isinstance(input_data, np.ndarray):
+        image_pil = Image.fromarray(input_data)
+        return image_pil.resize((width, height), Image.LANCZOS)
+    else:
+        raise TypeError("Input should be a path-like string or a cv2 image (numpy array).")
 
 def detect_left_face(img):
     img_array = np.array(image.img_to_array(img)).astype(np.uint8)
