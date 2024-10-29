@@ -4,6 +4,7 @@ import argparse
 import warnings
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 import tensorflow as tf
 from os.path import exists
 from os import makedirs, walk
@@ -81,12 +82,13 @@ def load_data(datasetPath, left_face_only):
     images = []
     labels = []
     folders = [folder for folder in os.listdir(datasetPath) if os.path.isdir(os.path.join(datasetPath, folder))]
-    for folder in folders:
+    for folder in tqdm(folders, desc="Procesando carpetas"):
         folder_path = os.path.join(datasetPath, folder)
-        img_list = [img for img in os.listdir(folder_path) if img.lower().endswith(('.jpg', '.png', 'jpeg'))]
-        for img_file in img_list:
+        img_list = [img for img in os.listdir(folder_path) if img.lower().endswith(('.jpg', '.png', '.jpeg'))]
+        for img_file in tqdm(img_list, desc=f"Procesando imágenes en {folder}", leave=False):
             img_path = os.path.join(folder_path, img_file)
             images.append(img_path)
+            
             if left_face_only:
                 img = load_img(img_path, width=WIDTH, height=HEIGHT)
                 img_crop = detect_left_face(img=img)
