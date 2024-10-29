@@ -136,9 +136,9 @@ def preprocess_img(image, height=200, width=350):
         g_channel = img_crop[..., 1]
         b_channel = img_crop[..., 2]
     else:
-        r_channel = image[..., 0]
-        g_channel = image[..., 1]
-        b_channel = image[..., 2]
+        r_channel = np.zeros_like(image[..., 0])
+        g_channel = np.zeros_like(image[..., 1])
+        b_channel = np.zeros_like(image[..., 2])
    
     image = tf.image.rgb_to_grayscale(image)
     imgScharr = scharr(image)
