@@ -91,8 +91,8 @@ def load_data(datasetPath, left_face_only):
             
             if left_face_only:
                 img = load_img(img_path, width=WIDTH, height=HEIGHT)
-                img_crop = detect_left_face(img=img)
-                labels.append(0 if img_crop is not None else 1)
+                img_crop = detect_left_face(img=img)                    
+                labels.append(0 if img_crop is not None and folder == "Reales" else 1)
             else:
                 labels.append(0 if folder == 'Reales' else 1)
     return np.array(images), np.array(labels)
