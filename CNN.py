@@ -92,11 +92,13 @@ def create_new_model(height, width, depth):
     for input_tensor in [input_LL, input_HL, input_LH, input_HH, input_Scharr, input_Sobel, input_Gabor]:
         x = conv_block(input_tensor, 32)
         x = attention_block(x)
-        branches.append(Flatten()(x))
-    
+        x = GlobalAveragePooling2D()(x)
+        branches.append(x)
+
     x_RGB = conv_block(input_RGB, 32)
     x_RGB = attention_block(x_RGB)
-    branches.append(Flatten()(x_RGB))
+    x_RGB = GlobalAveragePooling2D()(x_RGB)
+    branches.append(x_RGB)
 
     merged_output = Concatenate()(branches)
 
