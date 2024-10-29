@@ -68,21 +68,24 @@ def resize(component, target_height, target_width):
     )
 
 def preprocess_augmentation_img(image, height=200, width=350):
-    if random.random() > 0.5: 
-        image = tf.image.flip_up_down(image)
     image = tf.image.random_brightness(image, max_delta=0.5)
     image = tf.image.random_contrast(image, lower=0.65, upper=1.35)
     image = tf.image.random_hue(image, max_delta=0.2)
     
-    img_crop = detect_left_face(image)
-    if img_crop is not None:
-        r_channel = img_crop[..., 0]
-        g_channel = img_crop[..., 1]
-        b_channel = img_crop[..., 2]
-    else:
-        r_channel = np.zeros_like(image[..., 0])
-        g_channel = np.zeros_like(image[..., 1])
-        b_channel = np.zeros_like(image[..., 2])
+    image = tf.convert_to_tensor(image)
+    # img_crop = detect_left_face(image)
+    
+    # if img_crop is not None:
+    #     r_channel = img_crop[..., 0]
+    #     g_channel = img_crop[..., 1]
+    #     b_channel = img_crop[..., 2]
+    # else:
+    #     r_channel = np.zeros_like(image[..., 0])
+    #     g_channel = np.zeros_like(image[..., 1])
+    #     b_channel = np.zeros_like(image[..., 2])
+    r_channel = image[..., 0]
+    g_channel = image[..., 1]
+    b_channel = image[..., 2]
     
     image = tf.image.rgb_to_grayscale(image)
     imgScharr = scharr(image)
@@ -130,17 +133,21 @@ def preprocess_augmentation_img(image, height=200, width=350):
     }
     
 def preprocess_img(image, height=200, width=350):
-    img_crop = detect_left_face(image)
-    image = tf.convert_to_tensor(image)  
-    if img_crop is not None:
-        r_channel = img_crop[..., 0]
-        g_channel = img_crop[..., 1]
-        b_channel = img_crop[..., 2]
-    else:
-        r_channel = np.zeros_like(image[..., 0])
-        g_channel = np.zeros_like(image[..., 1])
-        b_channel = np.zeros_like(image[..., 2])
-   
+    image = tf.convert_to_tensor(image)
+    # img_crop = detect_left_face(image)
+    
+    # if img_crop is not None:
+    #     r_channel = img_crop[..., 0]
+    #     g_channel = img_crop[..., 1]
+    #     b_channel = img_crop[..., 2]
+    # else:
+    #     r_channel = np.zeros_like(image[..., 0])
+    #     g_channel = np.zeros_like(image[..., 1])
+    #     b_channel = np.zeros_like(image[..., 2])
+    r_channel = image[..., 0]
+    g_channel = image[..., 1]
+    b_channel = image[..., 2]
+    
     image = tf.image.rgb_to_grayscale(image)
     imgScharr = scharr(image)
     imgSobel = sobel(image)

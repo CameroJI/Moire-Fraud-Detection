@@ -45,8 +45,7 @@ def main(args):
     image_size = (HEIGHT, WIDTH)
         
     learning_rate = args.learning_rate
-    weight_decay = 1e-4
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate, weight_decay=weight_decay)
+    optimizer = tf.keras.optimizers.AdamW(learning_rate=learning_rate)
     
     if not exists(checkpointPath):
         makedirs(checkpointPath)
