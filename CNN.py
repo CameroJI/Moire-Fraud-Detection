@@ -98,9 +98,10 @@ def create_new_model(height, width, depth):
     x_RGB = attention_block(x_RGB)
     branches.append(Flatten()(x_RGB))
 
-    avg_output = Average()(branches)
-    
-    x = Dense(128, activation='relu')(avg_output)
+    merged_output = Concatenate()(branches)
+
+    # Continuar con las capas densas finales
+    x = Dense(128, activation='relu')(merged_output)
     x = Dropout(0.5)(x)
     x = Dense(64, activation='relu')(x)
     x = Dropout(0.5)(x)
