@@ -10,7 +10,7 @@ from os import makedirs, walk
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint # type: ignore
 
-from utils import preprocess_img, preprocess_augmentation_img, get_model, detect_left_face
+from utils import preprocess_img, preprocess_augmentation_img, get_model, detect_left_face, load_img
 from modelCallbacks import BatchCheckpointCallback, CustomImageDataGenerator
 
 warnings.filterwarnings('ignore', category=UserWarning)
@@ -35,6 +35,7 @@ def main(args):
     checkpointPath = args.checkpointPath
     loadCheckpoint = args.loadCheckpoint
     dataset_augmentation = args.dataset_augmentation
+    left_face_only = args.left_face_only
     
     unfreeze_layers = args.unfreeze_layers
     
@@ -64,8 +65,8 @@ def main(args):
     reduce_lr = ReduceLROnPlateau(monitor=monitor, factor=0.05, patience=2, mode=monitor_mode)
     checkpoint = ModelCheckpoint(f'{checkpointPath}/best_model.keras', monitor=monitor, save_best_only=True, verbose=1, mode=monitor_mode)
     
-    images, labels = load_data(datasetPath)
-    X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.2)
+    images, labels = load_data(datasetPath, left_face_only)
+    X_train, X_val, y_train, y_val = train_test_split(images, labels, test_size=0.1, shuffle=True)
 
     train_generator, val_generator = get_generator(X_train, y_train, X_val, y_val, batch_size, image_size, dataset_augmentation)
     
@@ -76,7 +77,7 @@ def main(args):
         callbacks=[batchCheckpointCallback, early_stopping, reduce_lr, checkpoint]
     )
     
-def load_data(datasetPath):
+def load_data(datasetPath, left_face_only):
     images = []
     labels = []
     folders = [folder for folder in os.listdir(datasetPath) if os.path.isdir(os.path.join(datasetPath, folder))]
@@ -87,6 +88,10 @@ def load_data(datasetPath):
             img_path = os.path.join(folder_path, img_file)
             images.append(img_path)
             labels.append(0 if folder == 'Reales' else 1)
+            if left_face_only:
+                img = load_img(img_path, width=WIDTH, height=HEIGHT)
+                img_crop = detect_left_face(img=img)
+                labels.append(0 if img_crop is not None else 1)
     return np.array(images), np.array(labels)
 
 def get_generator(X_train, y_train, X_val, y_val, batch_size, image_size, dataset_augmentation=False):
@@ -149,6 +154,7 @@ def parse_arguments(argv):
     parser.add_argument('--learning_rate', type=float, help='Model learning rate for iteration', default=1e-3)
     
     parser.add_argument('--dataset_augmentation', action='store_true', default=False, help='Use data augmentation on dataset')
+    parser.add_argument('--left_face_only', action='store_true', default=False, help='Use data augmentation on dataset')
     parser.add_argument('--loadCheckpoint', action='store_true', default=False, help='load Checkpoint Model')
 
     return parser.parse_args(argv)
