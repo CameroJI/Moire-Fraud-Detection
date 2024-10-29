@@ -48,8 +48,13 @@ def create_model(height, width, depth):
     return Model(inputs=[input_LL, input_HL, input_LH, input_HH, input_Scharr, input_Sobel, input_Gabor, input_R, input_G, input_B], outputs=predictions)
 
 def conv_block(input_tensor, filters, dropout_rate=0.3):
-    x = Conv2D(filters, (3, 3), activation='relu', padding='same')(input_tensor)
-    x = BatchNormalization()(x)
+    x1 = Conv2D(filters, (3, 3), activation='relu', padding='same')(input_tensor)
+    x1 = BatchNormalization()(x1)
+    x2 = Conv2D(filters, (5, 5), activation='relu', padding='same')(input_tensor)
+    x2 = BatchNormalization()(x2)
+    x3 = Conv2D(filters, (7, 7), activation='relu', padding='same')(input_tensor)
+    x3 = BatchNormalization()(x3)
+    x = Concatenate()([x1, x2, x3])
     x = Conv2D(filters, (3, 3), activation='relu', padding='same')(x)
     x = BatchNormalization()(x)
     x = MaxPooling2D((2, 2))(x)
