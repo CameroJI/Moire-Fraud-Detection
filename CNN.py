@@ -1,7 +1,7 @@
 from keras.models import Model # type: ignore
 from tensorflow.keras.models import Model # type: ignore
 from keras.layers import Input, Conv2D, Dense, Concatenate, Flatten, MaxPooling2D, Dropout, Multiply, Average, BatchNormalization, GlobalAveragePooling2D # type: ignore
-from tensorflow.keras.regularizers import l2
+from tensorflow.keras.regularizers import l2 # type: ignore
 
 def create_model(height, width, depth):
     input_LL = Input(shape=(height, width, depth), name='LL_Input')
