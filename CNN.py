@@ -1,6 +1,7 @@
 from keras.models import Model # type: ignore
 from tensorflow.keras.models import Model # type: ignore
 from keras.layers import Input, Conv2D, Dense, Concatenate, Flatten, MaxPooling2D, Dropout, Multiply, Average, BatchNormalization, GlobalAveragePooling2D # type: ignore
+from tensorflow.keras.regularizers import l2
 
 def create_model(height, width, depth):
     input_LL = Input(shape=(height, width, depth), name='LL_Input')
@@ -71,6 +72,29 @@ def attention_block(x):
     
     return attention
 
+def conv_block(input_tensor, filters, dropout_rate=0.3):
+    x1 = Conv2D(filters, (3, 3), activation='relu', padding='same', kernel_regularizer=l2(0.01))(input_tensor)
+    x1 = BatchNormalization()(x1)
+    x2 = Conv2D(filters, (5, 5), activation='relu', padding='same', kernel_regularizer=l2(0.01))(input_tensor)
+    x2 = BatchNormalization()(x2)
+    x3 = Conv2D(filters, (7, 7), activation='relu', padding='same', kernel_regularizer=l2(0.01))(input_tensor)
+    x3 = BatchNormalization()(x3)
+    x = Concatenate()([x1, x2, x3])
+    x = Conv2D(filters, (3, 3), activation='relu', padding='same', kernel_regularizer=l2(0.01))(x)
+    x = BatchNormalization()(x)
+    x = MaxPooling2D((2, 2))(x)
+    x = Dropout(dropout_rate)(x)
+    return x
+
+def attention_block(x):
+    attention = Conv2D(x.shape[-1], (1, 1), activation='relu', padding='same')(x)
+    attention = BatchNormalization()(attention)
+    attention = GlobalAveragePooling2D()(attention)
+    attention = Dense(x.shape[-1], activation='sigmoid')(attention)
+    attention = Multiply()([x, attention])
+    
+    return attention
+
 def create_new_model(height, width, depth):
     input_LL = Input(shape=(height, width, depth), name='LL_Input')
     input_HL = Input(shape=(height, width, depth), name='HL_Input')
@@ -100,9 +124,9 @@ def create_new_model(height, width, depth):
 
     avg_output = Average()(branches)
     
-    x = Dense(128, activation='relu')(avg_output)
+    x = Dense(128, activation='relu', kernel_regularizer=l2(0.01))(avg_output)
     x = Dropout(0.5)(x)
-    x = Dense(64, activation='relu')(x)
+    x = Dense(64, activation='relu', kernel_regularizer=l2(0.01))(x)
     x = Dropout(0.5)(x)
     predictions = Dense(1, activation='sigmoid')(x)
 
